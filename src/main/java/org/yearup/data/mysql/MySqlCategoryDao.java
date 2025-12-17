@@ -68,7 +68,6 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao{
     //method to get categories by ID
     @Override
     public Category getById(int categoryId) {
-    Category category = new Category();
 
     try (Connection connection = dataSource.getConnection();
 
@@ -88,15 +87,17 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao{
         //nested try to ensure the result set is closed properly
         try (ResultSet resultSet = stmt.executeQuery()) {
             if (resultSet.next()) {
+                Category category = new Category();
                 category.setCategoryId(resultSet.getInt("category_id"));
                 category.setName(resultSet.getString("name"));
                 category.setDescription(resultSet.getString("description"));
+                return category;
             }
         }
     } catch (SQLException e) {
         logger.log(Level.SEVERE, "Error getting category by ID: " + categoryId, e);
     }
-        return category;
+        return null;
     }
 
 
