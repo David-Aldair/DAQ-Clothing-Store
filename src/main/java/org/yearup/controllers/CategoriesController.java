@@ -1,8 +1,10 @@
 package org.yearup.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.CategoryDao;
 import org.yearup.data.ProductDao;
 import org.yearup.models.Category;
@@ -35,7 +37,16 @@ public class CategoriesController
     //returning category by ID
     @GetMapping("/{id}")
     public Category getById(@PathVariable int id) {
-        return categoryDao.getById(id);
+    Category category = categoryDao.getById(id);
+
+    //return 404 if the category does not exist
+        if (category == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                    "Category not found"
+    );
+    }
+        return category;
     }
 
     // the url to return all products in category 1 would look like this
