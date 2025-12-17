@@ -62,7 +62,7 @@ public class CategoriesController
 
     //creates a new category
     //admin access only
-    @PreAuthorize("hasRole('DAQ_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public Category addCategory(@RequestBody Category category) {
         return categoryDao.create(category);
@@ -70,7 +70,7 @@ public class CategoriesController
 
     //updates an existing category
     //admin access only
-    @PreAuthorize("hasRole('DAQ_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public void updateCategory(@PathVariable int id, @RequestBody Category category) {
         categoryDao.update(id, category);
@@ -78,7 +78,7 @@ public class CategoriesController
 
     //deletes a category
     //admin access only
-    @PreAuthorize("hasRole('DAQ_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteCategory(@PathVariable int id) {
         categoryDao.delete(id);
