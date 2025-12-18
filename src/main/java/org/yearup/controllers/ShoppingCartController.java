@@ -101,8 +101,26 @@ public class ShoppingCartController
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
     @DeleteMapping("")
-    public ShoppingCart clearCart(Principal principal) {
- return null;
-    }
+    public ShoppingCart clearCart(Principal principal)
+    {
+        try
+        {
+            // get username
+            String userName = principal.getName();
 
+            // loop up the user
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+
+            // delete all the items for the user
+            shoppingCartDao.clearCart(userId);
+
+            // return an empty cart object
+            return new ShoppingCart();
+        }
+        catch (Exception e)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to clear shopping cart" + e);
+        }
+    }
 }
