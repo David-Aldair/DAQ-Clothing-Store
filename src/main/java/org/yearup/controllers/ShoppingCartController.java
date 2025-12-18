@@ -1,11 +1,13 @@
 package org.yearup.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.ProductDao;
 import org.yearup.data.ShoppingCartDao;
 import org.yearup.data.UserDao;
 import org.yearup.models.ShoppingCart;
+import org.yearup.models.ShoppingCartItem;
 import org.yearup.models.User;
 
 import java.security.Principal;
@@ -31,7 +33,7 @@ public class ShoppingCartController
             int userId = user.getId();
 
             // use the shoppingcartDao to get all items in the cart and return the cart
-            //retrieve the shopping cart for the user
+            // retrieve the shopping cart for the user
             return shoppingCartDao.getByUserId(userId);
         }
         catch(Exception e)
@@ -42,14 +44,46 @@ public class ShoppingCartController
 
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
+    @PostMapping("/products/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShoppingCart addToCart(Principal principal, @PathVariable int id)
+    {
+        try
+        {
+            // get the logged in users username
+            String userName = principal.getName();
 
+            // look up the user in the database
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+
+            // add the product to the cart
+            // this should insert if product isn't in the cart and increment
+            shoppingCartDao.addToCart(id, userId);
+
+            // return the updated cart
+            return shoppingCartDao.getByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add product to cart");
+        }
+    }
 
     // add a PUT method to update an existing product in the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
+    @PutMapping("/products/{id}")
+    public ShoppingCart updateQuantity(Principal principal, @PathVariable int id, @RequestBody ShoppingCartItem item) {
+return null;
+    }
 
 
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
+    @DeleteMapping("")
+    public ShoppingCart clearCart(Principal principal) {
+ return null;
+    }
 
 }
