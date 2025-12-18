@@ -38,7 +38,7 @@ public class ShoppingCartController
         }
         catch(Exception e)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve shopping cart");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve shopping cart: " + e);
         }
     }
 
@@ -66,7 +66,7 @@ public class ShoppingCartController
         }
         catch (Exception e)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add product to cart");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add product to cart: " + e);
         }
     }
 
@@ -75,7 +75,26 @@ public class ShoppingCartController
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
     @PutMapping("/products/{id}")
     public ShoppingCart updateQuantity(Principal principal, @PathVariable int id, @RequestBody ShoppingCartItem item) {
-return null;
+
+        try
+        {
+            // get the username
+            String userName = principal.getName();
+
+            // get the user
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+
+            // update the quantity for the product in the cart
+            shoppingCartDao.editCart(id, userId, item.getQuantity());
+
+            // return the updated cart
+            return shoppingCartDao.getByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to update cart item quantity: " + e);
+        }
     }
 
 
