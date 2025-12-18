@@ -19,8 +19,6 @@ public class ShoppingCartController
     private UserDao userDao;
     private ProductDao productDao;
 
-
-
     // each method in this controller requires a Principal object as a parameter
     public ShoppingCart getCart(Principal principal)
     {
@@ -33,11 +31,12 @@ public class ShoppingCartController
             int userId = user.getId();
 
             // use the shoppingcartDao to get all items in the cart and return the cart
-            return null;
+            //retrieve the shopping cart for the user
+            return shoppingCartDao.getByUserId(userId);
         }
         catch(Exception e)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve shopping cart");
         }
     }
 
