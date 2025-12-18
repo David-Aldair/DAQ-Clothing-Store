@@ -100,9 +100,53 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
             throw new RuntimeException("Error adding product to cart", e);
         }
     }
-    @Override
-    public void editCart(int productId, int userId, int quantity) {
 
+    //updates quantity of a product already in the cart
+    //if the quantity  is > 0 it gets updated
+    //if the quantity == 0 it gets removed from the cart
+    @Override
+    public void editCart(int productId, int userId, int quantity)
+    {
+        //update the quantity
+        String updateSql = """
+            UPDATE shopping_cart
+            SET quantity = ?
+            WHERE user_id = ?
+              AND product_id = ?
+            """;
+
+        try (
+                Connection connection = getConnection();
+                PreparedStatement updateStmt =
+                        connection.prepareStatement(updateSql)){
+
+            updateStmt.setInt(1, quantity);
+            updateStmt.setInt(2, userId);
+            updateStmt.setInt(3, productId);
+
+            updateStmt.executeUpdate();
+
+            //if the quantity is == 0 we remove the row entirely
+            if (quantity == 0)
+            {
+                String deleteSql = """
+                    DELETE FROM
+                        shopping_cart
+                    WHERE
+                        user_id = ? AND product_id = ?
+                    """;
+
+                try (PreparedStatement deleteStmt = connection.prepareStatement(deleteSql)) {
+                    deleteStmt.setInt(1, userId);
+                    deleteStmt.setInt(2, productId);
+                    deleteStmt.executeUpdate();
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Error updating cart item", e);
+        }
     }
 
     @Override
