@@ -9,7 +9,13 @@ public class ShoppingCartItem
     private Product product = null;
     private int quantity = 1;
     private BigDecimal discountPercent = BigDecimal.ZERO;
+    private Integer userId;
 
+    public ShoppingCartItem(Product product, int quantity, Integer userId ) {
+        this.product = product;
+        this.quantity = quantity;
+        this.discountPercent = discountPercent;
+    }
 
     public Product getProduct()
     {
