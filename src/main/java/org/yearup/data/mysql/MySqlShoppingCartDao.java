@@ -1,5 +1,6 @@
 package org.yearup.data.mysql;
 
+import org.springframework.stereotype.Component;
 import org.yearup.data.ShoppingCartDao;
 import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
@@ -12,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Component
 public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao {
 
     //constructor
@@ -80,7 +82,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     public void addToCart(int productId, int userId)
     {
         String sql = """
-            INSERT INTO (user_id, product_id, quantity)
+            INSERT INTO shopping_cart (user_id, product_id, quantity)
             VALUES (?, ?, 1)
             ON DUPLICATE KEY UPDATE quantity = quantity + 1
             """;
@@ -149,9 +151,29 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         }
     }
 
-    @Override
-    public void clearCart(int userId) {
 
+    //this clears the entire shopping cart for a user
+    @Override
+    public void clearCart(int userId)
+    {
+        String sql = """
+            DELETE FROM
+                shopping_cart
+            WHERE
+                user_id = ?
+            """;
+
+        try (
+                Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, userId);
+            statement.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Error clearing shopping cart", e);
+        }
     }
 
     protected static Product mapProduct(ResultSet row) throws SQLException {
